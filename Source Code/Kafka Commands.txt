@@ -1,0 +1,59 @@
+
+ // Download Kafka server on your EC2 machine
+wget https://downloads.apache.org/kafka/3.8.0/kafka_2.13-3.8.0.tgz 
+
+ // uncompress kafka files
+tar -xvf kafka_2.13-3.8.0.tgz 
+-----------------------
+// check java version 
+java -version 
+
+//Manually Download and Install Amazon Corretto 17
+1- sudo rpm --import https://yum.corretto.aws/corretto.key
+2- sudo curl -o /etc/yum.repos.d/corretto.repo https://yum.corretto.aws/corretto.repo
+3- sudo yum install -y java-17-amazon-corretto
+4- java -version
+
+
+
+
+//Start Zoo-keeper:
+-------------------------------
+1- cd kafka_2.13-3.8.0
+2- bin/zookeeper-server-start.sh config/zookeeper.properties
+
+Open another window to start kafka
+But first ssh to to your ec2 machine as done above
+
+
+Start Kafka-server:
+----------------------------------------
+Duplicate the session & enter in a new console --
+// maximize kafka server memory on ec2
+1- export KAFKA_HEAP_OPTS="-Xmx256M -Xms128M"
+2- cd kafka_2.13-3.8.0
+
+// run kafka server
+3- bin/kafka-server-start.sh config/server.properties
+
+It is pointing to private server , change server.properties so that it can run in public IP 
+
+To do this , you can follow any of the 2 approaches shared belwo --
+Do a "sudo nano config/server.properties" - change ADVERTISED_LISTENERS to public ip of the EC2 instance
+
+
+Create the topic:
+-----------------------------
+Duplicate the session & enter in a new console --
+1- cd kafka_2.13-3.8.0
+2- bin/kafka-topics.sh --create --topic stock.market.test --bootstrap-server 13.60.251.96:9092 --replication-factor 1 --partitions 1 // change ip with your public ip on ec2 machine
+
+Start Producer:
+--------------------------
+bin/kafka-console-producer.sh --topic stock.market.test --bootstrap-server 13.60.251.96:9092 // change ip with your public ip on ec2 machine
+
+Start Consumer:
+-------------------------
+Duplicate the session & enter in a new console --
+1- cd kafka_2.13-3.8.0
+2- bin/kafka-console-consumer.sh --topic stock.market.test --bootstrap-server 13.60.251.96:9092  // change ip with your public ip on ec2 machine
